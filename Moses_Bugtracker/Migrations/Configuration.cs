@@ -29,6 +29,35 @@ namespace Moses_Bugtracker.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
+            context.TicketPriorities.AddOrUpdate(
+                t => t.Name,
+                   new TicketPriority { Name = "Low" },
+                   new TicketPriority { Name = "Medium" },
+                   new TicketPriority { Name = "High" },
+                   new TicketPriority { Name = "Immediate" }
+               );
+            context.TicketStatus.AddOrUpdate(
+                t => t.Name,
+                    new TicketStatus { Name = "New" },
+                    new TicketStatus { Name = "Closed" },
+                    new TicketStatus { Name = "Archived" },
+                    new TicketStatus { Name = "Assigned" },
+                    new TicketStatus { Name = "UnAssigned" }
+                );
+
+            context.TicketTypes.AddOrUpdate(
+                t => t.Name,
+                    new TicketType { Name = "Bug" },
+                    new TicketType { Name = "Typo" },
+                    new TicketType { Name = "Request for Documentation" },
+                    new TicketType { Name = "Request for Functionality" },
+                    new TicketType { Name = "Request for Discussion" }
+                );
+
+
+
+
+
             var roleManager = new RoleManager<IdentityRole>(
                 new RoleStore<IdentityRole>(context));
 
