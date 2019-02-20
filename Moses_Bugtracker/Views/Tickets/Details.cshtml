@@ -1,90 +1,173 @@
 ﻿@model Moses_Bugtracker.Models.Ticket
 
-@{
-    ViewBag.Title = "Details";
-}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Ticket Detail </h3>
+            </div>
+            <div class="title_right">
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for...">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">Go!</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<h2>Details</h2>
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>@Model.Title</h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li>
+                                <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="#">Settings 1</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Settings 2</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            <ul class="stats-overview">
+                                <li>
+                                    <span class="name"> Estimated budget </span>
+                                    <span class="value text-success"> 2300 </span>
+                                </li>
+                                <li>
+                                    <span class="name"> Total amount spent </span>
+                                    <span class="value text-success"> 2000 </span>
+                                </li>
+                                <li class="hidden-phone">
+                                    <span class="name"> Estimated project duration </span>
+                                    <span class="value text-success"> 20 </span>
+                                </li>
+                            </ul>
+                            <br />
+                            <div id="mainb" style="height:350px;"></div>
 
-<div>
-    <h4>Ticket</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.AssignedToUser.Email)
-        </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.AssignedToUser.Email)
-        </dd>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                using (Html.BeginForm("Create", "TicketComments", FormMethod.Post, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("TicketId", Model.Id)
 
-        <dt>
-            @Html.DisplayNameFor(model => model.OwnerUser.Email)
-        </dt>
+                                    <label for="message">Add Comment :</label>
+                                    <textarea name="CommentBody" class="form-control"></textarea>
 
-        <dd>
-            @Html.DisplayFor(model => model.OwnerUser.Email)
-        </dd>
+                                    <br />
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                }
+                            }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Project.Name)
-        </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Project.Name)
-        </dd>
+                            <hr />
 
-        <dt>
-            @Html.DisplayNameFor(model => model.TicketPriority.Name)
-        </dt>
+                            <div>
+                                <h4>Ticket Comments</h4>
+                                <!-- end of user messages -->
+                                <ul class="messages">
+                                    @foreach (var comment in Model.TicketComments.OrderByDescending(c => c.Created))
+                                    {
+                                        <li>
+                                            <img src="~/images/img.jpg" class="avatar" alt="Avatar">
+                                            <div class="message_date">
+                                                <h3 class="date text-info">@comment.Created.Day</h3>
+                                                <p class="month">@comment.Created.ToString("MMMM")</p>
+                                            </div>
+                                            <div class="message_wrapper">
+                                                <h4 class="heading">@comment.User.LastName, @comment.User.FirstName</h4>
+                                                <blockquote class="message">@comment.Comment</blockquote>
+                                                <br />
+                                            </div>
+                                        </li>
 
-        <dd>
-            @Html.DisplayFor(model => model.TicketPriority.Name)
-        </dd>
+                                    }
+                                </ul>
+                                <!-- end of user messages -->
 
-        <dt>
-            @Html.DisplayNameFor(model => model.TicketStatus.Name)
-        </dt>
+                            </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.TicketStatus.Name)
-        </dd>
+                        </div>
+                        <!-- start project-detail sidebar -->
+                        <div class="col-md-3 col-sm-3 col-xs-12">
+                            <section class="panel">
+                                <div class="x_title">
+                                    <h2>Ticket Description</h2>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="panel-body">
+                                    <h3 class="green"><i class="fa fa-paint-brush"></i> @Model.Title</h3>
+                                    <br />
+                                    <div class="project_detail">
+                                        <p class="title">Client Company</p>
+                                        <p>Deveint Inc</p>
+                                        <p class="title">Project Leader</p>
+                                        <p>Tony Chicken</p>
+                                    </div>
+                                    <br />
+                                    <h5>Ticket Attachments</h5>
+                                    <ul class="list-unstyled project_files">
+                                        @foreach (var attachment in Model.TicketAttachments)
+                                        {
+                                            <li>
+                                                <a href="@Url.Content(attachment.FilePath)" target="_blank"><i class="fa fa-file-picture-o"></i> @attachment.FilePath.Split('/')[2]</a>
+                                            </li>
+                                        }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.TicketType.Name)
-        </dt>
+                                    </ul>
+                                    <br />
 
-        <dd>
-            @Html.DisplayFor(model => model.TicketType.Name)
-        </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
+                                    <!-- Add a form here that allows a user to add a new Attachment and give it a Title -->
 
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Created)
-        </dt>
+                                    @using (Html.BeginForm("Create", "TicketAttachments", FormMethod.Post, new { enctype = "Multipart/form-data" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        @Html.Hidden("TicketId", Model.Id)
 
-        <dd>
-            @Html.DisplayFor(model => model.Created)
-        </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Updated)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Updated)
-        </dd>
-
-    </dl>
+                                        <div class="form-group">
+                                            @Html.Label("Add Attachment", htmlAttributes: new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                <input name="image" type="file" class="form-control" id="fileupload" />
+                                                <div class="text-center mtop20">
+                                                    <br />
+                                                    <button type="submit" class="btn btn-sm btn-primary">Add</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </section>
+                        </div>
+                        <!-- end project-detail sidebar -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+<!-- /page content -->

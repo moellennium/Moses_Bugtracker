@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 using Moses_Bugtracker.Models;
 
 namespace Moses_Bugtracker.Controllers
@@ -49,13 +50,17 @@ namespace Moses_Bugtracker.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Comment,Created,TicketId,UserId")] TicketComment ticketComment)
+        public ActionResult Create([Bind(Include = "TicketId")] TicketComment ticketComment, string commentBody)
         {
             if (ModelState.IsValid)
             {
+                ticketComment.Comment = commentBody;
+                ticketComment.Created = DateTime.Now;
+                ticketComment.UserId = User.Identity.GetUserId();
+
                 db.TicketComments.Add(ticketComment);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", "Tickets", new { id = ticketComment.TicketId });
             }
 
             ViewBag.TicketId = new SelectList(db.Tickets, "Id", "Title", ticketComment.TicketId);

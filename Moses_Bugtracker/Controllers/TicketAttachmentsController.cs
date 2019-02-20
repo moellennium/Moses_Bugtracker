@@ -51,20 +51,20 @@ namespace Moses_Bugtracker.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,TicketId,FilePath,Description,Created,UserId")] TicketAttachment ticketAttachment,HttpPostedFileBase image)
+        public ActionResult Create([Bind(Include = "TicketId")] TicketAttachment ticketAttachment,HttpPostedFileBase image)
         {
             if (ModelState.IsValid)
             {
-                if (ImageUploadValidator.IsWebFriendlyImage(image))
-                {
+                //if (ImageUploadValidator.IsWebFriendlyImage(image))
+                //{
                     var fileName = Path.GetFileName(image.FileName);
                     image.SaveAs(Path.Combine(Server.MapPath("~/Uploads/"), fileName));
                     ticketAttachment.FilePath = "/Uploads/" + fileName;
-                }
+                //}
                 ticketAttachment.Created = DateTime.Now;
                 db.TicketAttachments.Add(ticketAttachment);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details","Tickets",new { id=ticketAttachment.TicketId});
             }
 
             ViewBag.TicketId = new SelectList(db.Tickets, "Id", "Title", ticketAttachment.TicketId);
