@@ -171,3 +171,15 @@
     </div>
 </div>
 <!-- /page content -->
+
+
+@section scripts{
+
+    <script>
+        var errorMsg = '@TempData["ErrorMsg"]';
+        if (errorMsg != "") {
+            alert(errorMsg);
+        }
+    </script>
+
+}

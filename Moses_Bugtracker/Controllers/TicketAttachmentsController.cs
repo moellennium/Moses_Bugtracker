@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Moses_Bugtracker.Helpers;
 using Moses_Bugtracker.Models;
 using static Moses_Bugtracker.Helpers.ProjectsHelper;
 
@@ -55,21 +56,24 @@ namespace Moses_Bugtracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                //if (ImageUploadValidator.IsWebFriendlyImage(image))
-                //{
+                if (FileUploadValidator.IsWebFriendlyFile(image))
+                {
                     var fileName = Path.GetFileName(image.FileName);
                     image.SaveAs(Path.Combine(Server.MapPath("~/Uploads/"), fileName));
                     ticketAttachment.FilePath = "/Uploads/" + fileName;
-                //}
+                }
+                else
+                {
+                    TempData["ErrorMsg"] = $"The file you tried uploading ({image.FileName}) is an invalid type. We do not allow uploading files with that extension.";
+                    return RedirectToAction("Details", "Tickets", new { id = ticketAttachment.TicketId });
+                }
+
                 ticketAttachment.Created = DateTime.Now;
                 db.TicketAttachments.Add(ticketAttachment);
-                db.SaveChanges();
-                return RedirectToAction("Details","Tickets",new { id=ticketAttachment.TicketId});
-            }
-
-            ViewBag.TicketId = new SelectList(db.Tickets, "Id", "Title", ticketAttachment.TicketId);
-            ViewBag.UserId = new SelectList(db.Users, "Id", "Email", ticketAttachment.UserId);
-            return View(ticketAttachment);
+                db.SaveChanges();               
+            }        
+            
+            return RedirectToAction("Details", "Tickets", new { id = ticketAttachment.TicketId});
         }
 
         // GET: TicketAttachments/Edit/5
@@ -98,7 +102,7 @@ namespace Moses_Bugtracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (ImageUploadValidator.IsWebFriendlyImage(image))
+                if (FileUploadValidator.IsWebFriendlyFile(image))
                 {
                     var fileName = Path.GetFileName(image.FileName);
                     image.SaveAs(Path.Combine(Server.MapPath("~/Uploads/"), fileName));
