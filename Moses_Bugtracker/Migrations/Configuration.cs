@@ -2,6 +2,7 @@ namespace Moses_Bugtracker.Migrations
 {
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.EntityFramework;
+    using Moses_Bugtracker.Helpers;
     using Moses_Bugtracker.Models;
     using System;
     using System.Data.Entity;
@@ -85,9 +86,10 @@ namespace Moses_Bugtracker.Migrations
 
                roleManager.Create(new IdentityRole { Name = "Submitter" });
             }
-                
 
 
+
+            #region User Seeding section
 
             var userManager = new UserManager<ApplicationUser>(
                 new UserStore<ApplicationUser>(context));
@@ -151,17 +153,91 @@ namespace Moses_Bugtracker.Migrations
                 }, "Abc&123!");
 
             }
-            var userId = userManager.FindByEmail("DemoAdmin@mailinator.com").Id;
-            userManager.AddToRole(userId, "Admin");
+            var demoAdminId = userManager.FindByEmail("DemoAdmin@mailinator.com").Id;
+            userManager.AddToRole(demoAdminId, "Admin");
 
-            userId = userManager.FindByEmail("DemoProjectManager@mailinator.com").Id;
-            userManager.AddToRole(userId, "Project Manager");
+            var demoPMId = userManager.FindByEmail("DemoProjectManager@mailinator.com").Id;
+            userManager.AddToRole(demoPMId, "Project Manager");
 
-            userId = userManager.FindByEmail("DemoDeveloper@mailinator.com").Id;
-            userManager.AddToRole(userId, "Developer");
+            var demoDevId = userManager.FindByEmail("DemoDeveloper@mailinator.com").Id;
+            userManager.AddToRole(demoDevId, "Developer");
 
-            userId = userManager.FindByEmail("DemoSubmitter@mailinator.com").Id;
-            userManager.AddToRole(userId, "Submitter");
+            var demoSubId = userManager.FindByEmail("DemoSubmitter@mailinator.com").Id;
+            userManager.AddToRole(demoSubId, "Submitter");
+
+            #endregion
+
+            #region Project Seeding section
+            context.Projects.AddOrUpdate(
+                p => p.Name,
+                    new Project { Name = "Seeded Project 1" },
+                    new Project { Name = "Seeded Project 2" }                  
+                );
+
+            context.SaveChanges();
+
+            //Now that I have saved the Projects to the DB I need to get their Id's by Name
+            var project1Id = context.Projects.FirstOrDefault(p => p.Name == "Seeded Project 1").Id;
+            var project2Id = context.Projects.FirstOrDefault(p => p.Name == "Seeded Project 2").Id;
+
+            var projHelper = new ProjectsHelper();
+            projHelper.AddUserToProject(demoPMId, project1Id);
+            projHelper.AddUserToProject(demoSubId, project1Id);
+            projHelper.AddUserToProject(demoDevId, project1Id);
+            projHelper.AddUserToProject(demoPMId, project2Id);
+            projHelper.AddUserToProject(demoSubId, project2Id);
+            projHelper.AddUserToProject(demoDevId, project2Id);
+            #endregion
+
+            #region Ticket Seeding section
+            var priorityId = context.TicketPriorities.FirstOrDefault(t => t.Name == "Medium").Id;
+            var statusId = context.TicketStatus.FirstOrDefault(t => t.Name == "New").Id;
+            var typeId = context.TicketTypes.FirstOrDefault(t => t.Name == "Bug").Id;
+
+            context.Tickets.AddOrUpdate(
+                t => t.Title,
+                    new Ticket
+                    {
+                        Title = "Seeded Ticket 1: Project 1",
+                        ProjectId = project1Id,
+                        Created = DateTime.Now,
+                        AssignedToUserId = demoDevId,
+                        OwnerUserId = demoSubId,
+                        TicketStatusId = statusId,
+                        TicketTypeId = typeId,
+                        TicketPriorityId = priorityId
+                    },
+                     new Ticket
+                     {
+                         Title = "Seeded Ticket 2: Project 2",
+                         ProjectId = project2Id,
+                         Created = DateTime.Now,
+                         AssignedToUserId = demoDevId,
+                         OwnerUserId = demoSubId,
+                         TicketStatusId = statusId,
+                         TicketTypeId = typeId,
+                         TicketPriorityId = priorityId
+                     }
+                );
+
+            context.SaveChanges();
+            #endregion
+
+            #region Ticket Comment Seeding section
+
+            #endregion
+
+
+            #region Ticket Attachment Seeding section
+            #endregion
+
+
+            #region Ticket Notification Seeding section
+            #endregion
+
+            #region Ticket History section
+            #endregion
+
         }
     }
 }
