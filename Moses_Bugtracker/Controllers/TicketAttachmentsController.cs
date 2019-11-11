@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 using Moses_Bugtracker.Helpers;
 using Moses_Bugtracker.Models;
 using static Moses_Bugtracker.Helpers.ProjectsHelper;
@@ -24,6 +25,22 @@ namespace Moses_Bugtracker.Controllers
             return View(db.TicketAttachments.Where(t => t.TicketId == id).ToList());
         }
 
+        [Authorize]
+        public ActionResult MyIndex()
+        {
+            var userId = User.Identity.GetUserId();
+            return View("Index", db.TicketAttachments.Where(t => t.UserId == userId).ToList());
+
+
+        }
+
+        
+        public ActionResult AllIndex()
+        {
+
+            return View("Index", db.TicketAttachments.ToList());
+
+        }
         // GET: TicketAttachments/Details/5
         public ActionResult Details(int? id)
         {

@@ -5,7 +5,7 @@
 
 <h2>@ViewBag.Title.</h2>
 
-@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" }))
 {
     // we want to add additional controls so the person that is registering can enter information such as (FirstName, LastName etc....)
     @Html.AntiForgeryToken()
@@ -47,6 +47,12 @@
             @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
         </div>
     </div>
+    <div class="form-group">
+            @Html.Label("Select an Avatar", new { @class = "col-md-2 control-label" })
+            <div class="col-md-10">
+               <input type="file" name="avatar"/>
+            </div>
+        </div>
     <div class="form-group">
         @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">

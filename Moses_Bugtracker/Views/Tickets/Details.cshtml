@@ -110,65 +110,97 @@
                             </div>
 
                         </div>
-                        <!-- start project-detail sidebar -->
-                        <div class="col-md-3 col-sm-3 col-xs-12">
-                            <section class="panel">
-                                <div class="x_title">
-                                    <h2>Ticket Description</h2>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="panel-body">
-                                    <h3 class="green"><i class="fa fa-paint-brush"></i> @Model.Title</h3>
-                                    <br />
-                                    <div class="project_detail">
-                                        <p class="title">Client Company</p>
-                                        <p>Deveint Inc</p>
-                                        <p class="title">Project Leader</p>
-                                        <p>Tony Chicken</p>
-                                    </div>
-                                    <br />
-                                    <h5>Ticket Attachments</h5>
-                                    <ul class="list-unstyled project_files">
-                                        @foreach (var attachment in Model.TicketAttachments)
-                                        {
+
+                        <div class="clearfix"></div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="x_panel">
+                                    <div class="x_title">
+                                        <h2>Edit</h2>
+                                        <ul class="nav navbar-right panel_toolbox">
                                             <li>
-                                                <a href="@Url.Content(attachment.FilePath)" target="_blank"><i class="fa fa-file-picture-o"></i> @attachment.FilePath.Split('/')[2]</a>
+                                                <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                             </li>
-                                        }
+                                            <li class="dropdown">
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li>
+                                                        <a href="#">Settings 1</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">Settings 2</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <a class="close-link"><i class="fa fa-close"></i></a>
+                                            </li>
+                                        </ul>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content">
 
-                                    </ul>
-                                    <br />
 
 
-                                    <!-- Add a form here that allows a user to add a new Attachment and give it a Title -->
-
-
-                                    @using (Html.BeginForm("Create", "TicketAttachments", FormMethod.Post, new { enctype = "Multipart/form-data" }))
-                                    {
-                                        @Html.AntiForgeryToken()
-                                        @Html.Hidden("TicketId", Model.Id)
-
-
-                                        <div class="form-group">
-                                            @Html.Label("Add Attachment", htmlAttributes: new { @class = "control-label col-md-2" })
-                                            <div class="col-md-10">
-                                                <input name="image" type="file" class="form-control" id="fileupload" />
-                                                <div class="text-center mtop20">
-                                                    <br />
-                                                    <button type="submit" class="btn btn-sm btn-primary">Add</button>
+                                        <!-- start project-detail sidebar -->
+                                        <div class="col-md-3 col-sm-3 col-xs-12">
+                                            <section class="panel">
+                                                <div class="x_title">
+                                                    <h2>Ticket Description</h2>
+                                                    <div class="clearfix"></div>
                                                 </div>
-                                            </div>
+                                                <div class="panel-body">
+                                                    <h3 class="green"><i class="fa fa-paint-brush"></i> @Model.Title</h3>
+                                                    <br />
+                                                    <div class="project_detail">
+                                                        <p class="title">Client Company</p>
+                                                        <p>Deveint Inc</p>
+                                                        <p class="title">Project Leader</p>
+                                                        <p>Tony Chicken</p>
+                                                    </div>
+                                                    <br />
+                                                    <h5>Ticket Attachments</h5>
+                                                    <ul class="list-unstyled project_files">
+                                                        @foreach (var attachment in Model.TicketAttachments)
+                                                        {
+                                                            <li>
+                                                                <a href="@Url.Content(attachment.FilePath)" target="_blank"><i class="fa fa-file-picture-o"></i> @attachment.FilePath.Split('/')[2]</a>
+                                                            </li>
+                                                        }
+
+                                                    </ul>
+                                                    <br />
+
+
+                                                    <!-- Add a form here that allows a user to add a new Attachment and give it a Title -->
+
+
+                                                    @using (Html.BeginForm("Create", "TicketAttachments", FormMethod.Post, new { enctype = "Multipart/form-data" }))
+                                                    {
+                                                        @Html.AntiForgeryToken()
+                                                        @Html.Hidden("TicketId", Model.Id)
+
+
+                                                        <div class="form-group">
+                                                            @Html.Label("Add Attachment", htmlAttributes: new { @class = "control-label col-md-2" })
+                                                            <div class="col-md-10">
+                                                                <input name="image" type="file" class="form-control" id="fileupload" />
+                                                                <div class="text-center mtop20">
+                                                                    <br />
+                                                                    <button type="submit" class="btn btn-sm btn-primary">Add</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </section>
                                         </div>
-                                    }
+                                        <!-- end project-detail sidebar -->
+                                    </div>
                                 </div>
-                            </section>
+                            </div>
                         </div>
-                        <!-- end project-detail sidebar -->
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 <!-- /page content -->
 

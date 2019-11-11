@@ -3,6 +3,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Moses_Bugtracker.Models
 {
+    public class LoginRegisterViewModel
+    {
+        public LoginViewModel LVM { get; set; }
+        public RegisterViewModel RVM { get; set; }
+        
+        public LoginRegisterViewModel()
+        {
+            LVM = new LoginViewModel();
+            RVM = new RegisterViewModel();
+        }
+    }
+
     public class ExternalLoginConfirmationViewModel
     {
         [Required]
@@ -64,11 +76,11 @@ namespace Moses_Bugtracker.Models
 
     public class RegisterViewModel
     {
-        [Required]
+        
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [Required]
+        
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
@@ -78,9 +90,7 @@ namespace Moses_Bugtracker.Models
         [Display (Name = "Phone Number")]
         public string PhoneNumber { get; set; }
 
-        [Display(Name = "Avatar Path")]
-        public string AvatarPath { get; set; }
-
+        
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
@@ -94,7 +104,7 @@ namespace Moses_Bugtracker.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        //[Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
     }
 

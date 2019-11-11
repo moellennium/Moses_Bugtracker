@@ -8,6 +8,7 @@ namespace Moses_Bugtracker.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
+
     internal sealed class Configuration : DbMigrationsConfiguration<Moses_Bugtracker.Models.ApplicationDbContext>
     {
         public Configuration()

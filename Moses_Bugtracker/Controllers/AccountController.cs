@@ -9,6 +9,11 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Moses_Bugtracker.Models;
+using Moses_Bugtracker.Helpers;
+using System.IO;
+using System.Web.Configuration;
+using System.Text;
+using System.Diagnostics;
 
 namespace Moses_Bugtracker.Controllers
 {
@@ -66,16 +71,22 @@ namespace Moses_Bugtracker.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<ActionResult> Login(LoginRegisterViewModel model, string returnUrl, string DemoKey)
         {
-            if (!ModelState.IsValid)
+            if (!string.IsNullOrEmpty(DemoKey))
             {
-                return View(model);
+                model.LVM.Email = WebConfigurationManager.AppSettings[DemoKey];
+                model.LVM.Password = WebConfigurationManager.AppSettings["DemoPassword"];
+                
             }
+            //else if (!ModelState.IsValid)
+            //{
+            //    return View(model);
+            //}
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.LVM.Email, model.LVM.Password, false, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -83,11 +94,23 @@ namespace Moses_Bugtracker.Controllers
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
                 case SignInStatus.Failure:
                 default:
+                    //var message = new StringBuilder();        
                     ModelState.AddModelError("", "Invalid login attempt.");
+                    //foreach (var modelError in ModelState)
+                    //{
+                    //    string propertyName = modelError.Key;
+                    //    if (modelError.Value.Errors.Count > 0)
+                    //    {
+                    //        message.AppendLine($"The error key is : {propertyName}, the value is : {string.Join("::",modelError.Value.Errors.Select(e => e.ErrorMessage))}");                      
+                    //    }
+                    //}
+
+                    //Debug.WriteLine(message.ToString());
                     return View(model);
+        
             }
         }
 
@@ -147,22 +170,33 @@ namespace Moses_Bugtracker.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public async Task<ActionResult> Register(LoginRegisterViewModel model, HttpPostedFileBase avatar)
         {
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
                 {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    DisplayName = model.DisplayName,
-                    PhoneNumber = model.PhoneNumber,
+                    UserName = model.RVM.Email,
+                    Email = model.RVM.Email,
+                    FirstName = model.RVM.FirstName,
+                    LastName = model.RVM.LastName,
+                    DisplayName = model.RVM.DisplayName,
+                    PhoneNumber = model.RVM.PhoneNumber,
                     AvatarPath = "/Avatars/default.png"
 
                 };
-                var result = await UserManager.CreateAsync(user, model.Password);
+
+                if (avatar != null)
+                {
+                    if (FileUploadValidator.IsWebFriendlyImage(avatar))
+                    {
+                        var fileName = Path.GetFileName(avatar.FileName);
+                        avatar.SaveAs(Path.Combine(Server.MapPath("~/Avatars/"), fileName));
+                        user.AvatarPath = "/Avatars/" + fileName;
+                    }
+                }
+
+                var result = await UserManager.CreateAsync(user, model.RVM.Password);
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
@@ -179,7 +213,7 @@ namespace Moses_Bugtracker.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return RedirectToAction("Login",model);
         }
 
         //
@@ -395,15 +429,23 @@ namespace Moses_Bugtracker.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Account/LogOff
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
+
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
         }
+
+
+        //
+        // POST: /Account/LogOff
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult LogOff()
+        //{
+        //    AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+        //    return RedirectToAction("Index", "Home");
+        //}
 
         //
         // GET: /Account/ExternalLoginFailure
